@@ -1,5 +1,4 @@
-package TP4;
-
+// package Q4;
 /*
  *@author Eduardo Lemos
  *02/11/2022
@@ -12,7 +11,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-class TP04Q01 {
+class TP04Q04 {
 
     public static HashMap<Integer, Game> map = new HashMap<>();
 
@@ -40,13 +39,17 @@ class TP04Q01 {
             list.insertEnd(game);
         }
 
+        list.quicksort();
+        list.show();
+
+        scanner.close();
     }
 
     public static void lerArquivoCsv() throws Exception {
     	//HOW THE FUCK DO I CHANGE THE CHARSET??
     	
     	Game[] game = new Game[6000];
-        Scanner sc = new Scanner(new File("/tmp/games.csv"));
+        Scanner sc = new Scanner(new File("games.csv"));
         sc.useDelimiter(",");
         int i = 0;
         while (sc.hasNextLine()) {
@@ -204,7 +207,7 @@ class Game {
         setWindows(false);
         setMac(false);
         setLinux(false);
-        setData(TP04Q01.toDate(d, 0));
+        setData(TP04Q04.toDate(d, 0));
         
     }
 
@@ -430,6 +433,13 @@ class Cell {
  class Doubly{
     Cell first,last;
 
+    //class constructor
+    public Doubly(){
+        first = new Cell();
+        last = first;
+    }
+
+
     //insert in end
     public void insertEnd(Game x){
         last.next = new Cell(x);
@@ -478,8 +488,6 @@ class Cell {
     }
     
 
-
-
     //get cell at wished position
     public Cell at(int pos) throws Exception {
         if(pos < 0 || pos > size()){throw new Exception("Error. Position is invalid.");
@@ -501,4 +509,54 @@ class Cell {
         return i;
     }
 
+
+    public void show() throws Exception {
+		int i = 0;
+		Cell tmp = first.next;
+		while(tmp != null) {
+			System.out.println(tmp.game.getApp_ID() + " " + tmp.game.getName() + " " + toString(tmp.game.getData()) + " " + tmp.game.getOwners() + " " + 
+					tmp.game.getAge() + " " + price(tmp.game.getPrice()) + " " + tmp.game.getDlcs() + " " + tmp.game.getLanguages() +  " " + tmp.game.getWebsite() + " " +
+					tmp.game.getWindows() + " " + tmp.game.getMac() + " " + tmp.game.getLinux() + " " + tmp.game.getUpVotes() + " " + converterHora(tmp.game.getAvg_Pt()) +
+		            " " + tmp.game.getDevelopers() + " " + tmp.game.getGenre());
+			i++;
+			tmp = tmp.next;
+		}
+	}
+	
+	public static String toString(Date date) throws Exception{
+        String s = new SimpleDateFormat("MMM/yyyy").format(date);
+        return s.replace("jan", "Jan").replace("fev", "Feb").replace("mar", "Mar")
+        .replace("abr", "Apr").replace("mai", "May").replace("jun", "Jun")
+        .replace("jul", "Jul").replace("ago", "Aug").replace("set", "Sep")
+        .replace("out", "Oct").replace("nov", "Nov").replace("dez", "Dec");
+    }
+	
+	public static String price(float price) {
+        int p = (int)price;
+        float dif = price - p;
+        if (price == 0) {
+            return "0.00";
+        } else if (dif == 0) {
+            return String.valueOf(price) + "0";
+        } else {
+            return String.valueOf(price);
+        }
+    }
+	
+	public static String converterHora(float time) {
+        if (time == 0) {
+            return null;
+        }
+        int hora, minutos;
+        hora = (int)time/60;
+        minutos = (int)time%60;
+        if (hora > 0 && minutos > 0) {
+            return hora + "h" + " " + minutos + "m";
+        } else if (hora > 0 && minutos == 0) {
+            return hora + "h";
+        } else if (hora == 0 && minutos > 0) {
+            return minutos + "m";
+        }
+        return null;
+    }
  }
