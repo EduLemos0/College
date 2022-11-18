@@ -1,0 +1,7 @@
+ p++ -> Passará a mostrar o endereço de memória superior.
+
+(*p)++  -> Aumenta o valor do conteúdo apontado por "p".
+
+*(p++) -> Acessa o valor do endereço superior à "p".
+
+*(p+10) -> Acessa o valor armazenado pelo endereço(p+10) que está 10 posições na frente de p.

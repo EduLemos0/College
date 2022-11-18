@@ -1,0 +1,2 @@
+No Código 1, será impresso o valor alocado em ptr (*ptr). 
+No Código 2, será impresso o endereço de memória das 5 posições acima do endereço de "ptr".

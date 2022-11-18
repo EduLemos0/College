@@ -1,0 +1,26 @@
+#include <stdio.h>
+
+int main(void) {
+  int por2=0, por3e9=0, por5=0, rep=0, num=0;
+  printf("Digite quantos números terão na sequência: "); //controlar o número de repetições usando for e uma variável n.
+  scanf("%d",&rep);
+  for(int x = 1; x<=rep; x++){
+    printf("\nDigite um número: ");
+    scanf("%d", &num);
+
+    if(num % 2 == 0){
+      por2++;
+    } else if((num % 3 == 0)&&(num % 9 == 0)){
+      por3e9++;
+    } else if(num % 5 == 0){
+      por5++;
+    } else{
+      printf("Número não divisível pelos valores\n");
+    }
+  }
+
+  printf("Números divisíveis por 2: %d\n",por2);
+  printf("Números divisíveis por 3 e 9: %d\n",por3e9);
+  printf("Números divisíveis por 5: %d\n",por5);
+  
+}
