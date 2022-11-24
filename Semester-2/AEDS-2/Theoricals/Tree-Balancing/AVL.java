@@ -103,7 +103,6 @@ public class AVL{
     public static void main(String[] args) throws Exception{
 
         AVLTree tree = new AVLTree();
-
         tree.insert(5);
         tree.insert(7);
         tree.insert(9);
