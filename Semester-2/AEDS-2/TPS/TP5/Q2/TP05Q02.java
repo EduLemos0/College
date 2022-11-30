@@ -574,7 +574,7 @@ class Tree{
 
     private boolean search(Node curr, String name)throws Exception{
         boolean ans = false;
-        
+        if(curr == null)
 
     }
 
