@@ -27,7 +27,8 @@ public class Main{
 
             //get amount of goals
             int goals1 = Integer.parseInt(team1[1]);
-            int goals2 = Integer.parseInt(team2[1]);
+            System.out.println(team2[1]);
+            int goals2 = Integer.parseInt(team2[0]);
 
             //add goals
             score[p1] += goals1;
@@ -52,20 +53,18 @@ public class Main{
             System.out.println("O Sport nao foi o campeao. O time campeao foi o " + names[ans] + " com " + score[ans] + " pontos : (");
         }
 
+        scanner.close();
     }
 
     static int getWinner(int score[]){
         //get position of highest element
         int num = 0; 
-        for(int i = 0; i < score.length; i++){
-            if(score[i] > num){num = score[i];}
-        }
+        for(int i = 0; i < score.length; i++) if(score[i] > num) num = score[i];
 
         int pos = 0;
 
-        for(int i = 0; i < score.length; i++){
-            if(score[i]  == num){pos = i;}
-        }
+        for(int i = 0; i < score.length; i++) if(score[i]  == num) pos = i;
+        
         return pos;
     }
 
