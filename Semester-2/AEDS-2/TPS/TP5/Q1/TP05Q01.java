@@ -32,12 +32,14 @@ public class TP05Q01 {
         //create entry1 and entry2 to storage the given data
 		String[] entry1 = new String[1000];
 		String[] entry2 = new String[1000];
+        String[] searchEntry = new String[1000];
 		Scanner scanner = new Scanner(System.in);
 		Tree tree = new Tree(); // create list of objects
         int sz;
 
 		int entryNumber1 = 0;
         int entryNumber2 = 0;
+        int entryNumber3 = 0;
 		
 		//fill entry1 variable with the IDs
 		do {
@@ -54,23 +56,35 @@ public class TP05Q01 {
         //assign game objects from hashMap to GameStack
         for(int i = 0; i < entryNumber1; i++) {
             Game game = map.get(Integer.valueOf(entry1[i]));
-            stack.insertEnd(game);
+            tree.insert(game.getName());
         }
         
-       
-        
         //treat insertion and removal conditions
-        for(int i = 0; i < entryNumber2; i++) {
+        for(int i = 0; i < sz; i++) {
         	if(entry2[i].startsWith("I")) {
         		String[] spl = entry2[i].split(" ");
         		int value = Integer.valueOf(spl[1]);
-        		stack.insertEnd(map.get(value));
+                Game game = map.get(value);
+        		tree.insert(game.getName());
         	}
         	if(entry2[i].startsWith("R")) {
-        		Game game = stack.removeTail();
-        		System.out.println("(R)" + game.getName());
+                String[] spl = entry2[i].split(" ",2);
+        		tree.remove(spl[1]);
         	}
         }
+
+        //fill third entry
+        do{
+            searchEntry[entryNumber3] = scanner.nextLine();
+        } while(ended(searchEntry[entryNumber3++]) != true);
+        entryNumber3--;
+
+        //search names
+        for(int i = 0; i < entryNumber3; i++){
+            System.out.println(searchEntry[i]);
+            tree.search(searchEntry[i]);
+        }
+
 	}
 	
 	
@@ -488,12 +502,12 @@ public class TP05Q01 {
 
 //create node class
 class Node{
-    Game element;
+    String element;
     Node right,left;
 
     //class constructor
-    public Node(Game x){
-        this.element = x;
+    public Node(String s){
+        this.element = s;
         right = left = null;
     }
 }
@@ -506,25 +520,25 @@ class Tree{
     public Tree(){root  = null;}
 
     //insertion
-    public void insert(Game x){root = insert(root,x);}
+    public void insert(String s){root = insert(root,s);}
 
-    private Node insert(Node curr, Game x){
-        if(curr == null){curr = new Node(x);
-        }else if(x.getName().compareTo(curr.element.getName()) < 0) {curr.left = insert(curr.left,x);
-        }else if(x.getName().compareTo(curr.element.getName()) > 0) {curr.right = insert(curr.right,x);
-        }else if(x.getName().equals(curr.element.getName())){;}
+    private Node insert(Node curr, String s){
+        if(curr == null){curr = new Node(s);
+        }else if(s.compareTo(curr.element) < 0) {curr.left = insert(curr.left,s);
+        }else if(s.compareTo(curr.element) > 0) {curr.right = insert(curr.right,s);
+        }else if(s.equals(curr.element)){;}
         return curr;
     }
 
-    public String remove(Game x) throws Exception{
-        Node removed = remove(root,x);
-        return removed.element.getName();
+    public String remove(String s) throws Exception{
+        Node removed = remove(root,s);
+        return removed.element;
     }
 
-    private Node remove(Node curr, Game x) throws Exception{
+    private Node remove(Node curr, String s) throws Exception{
         if(curr == null){throw new Exception("Tree is empty.");
-        }else if(x.getName().compareTo(curr.element.getName()) < 0) {curr.left = remove(curr.left,x);
-        }else if(x.getName().compareTo(curr.element.getName()) > 0) {curr.right = remove(curr.right,x);
+        }else if(s.compareTo(curr.element) < 0) {curr.left = remove(curr.left,s);
+        }else if(s.compareTo(curr.element) > 0) {curr.right = remove(curr.right,s);
         }else if(curr.right == null) {curr = curr.left;
         }else if(curr.left == null){curr = curr.right;
         }else {curr.left = highestLeft(curr, curr.left);}
@@ -545,15 +559,21 @@ class Tree{
 
     public void search(String s){
         boolean ans = search(root,s);
-        if(ans == true){System.out.println("SIM");
-        }else {System.out.println("NAO");}
+        if(ans == true){System.out.print("SIM");
+        }else {System.out.print("NAO");}
+        System.out.println();
     }
 
     private boolean search(Node curr, String s){
         boolean ans = false;
         if(curr == null) {ans = false;
-        }else if(s.compareTo(curr.element.getName()) < 0) {ans = search(curr.left, s);
-        }else if(s.compareTo(curr.element.getName()) > 0) {ans = search(curr.right, s);}
+        }else if(s.compareTo(curr.element) < 0) {
+            System.out.print("esq" + " ");
+            ans = search(curr.left, s);
+        }else if(s.compareTo(curr.element) > 0) {
+            System.out.print("dir" + " ");
+            ans = search(curr.right, s);
+        }
         
         return ans;
     }
