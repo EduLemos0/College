@@ -21,6 +21,172 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;  
 import java.util.Date;
 
+//create node class\\
+class Node{
+    String name;
+    int level;
+    Node left,right;
+
+    //class constructor
+    public Node(String s){
+        this.name = s;
+        level = 0; 
+        left = right = null;
+    }
+
+    //calculate amount of levels
+    public void setLevel() {this.level = 1 + Math.max(getLevel(left), getLevel(right));}
+
+    //get level
+    public static int getLevel(Node curr) {return (curr == null) ? 0 : curr.level;}
+}
+
+//create class AVL\\
+class AVL{
+    private Node root;
+
+    //initialize tree
+    public AVL(){root = null;}
+
+    //insert element
+    public void insert(String s) throws Exception {
+        root = insert(s,root);
+    }
+
+    //actual insertion
+    private Node insert(String s, Node curr) throws Exception {
+        if(curr == null){curr = new Node(s);
+        }else if(s.compareTo(curr.name) < 0) {curr.left = insert(s,curr.left);
+        }else if(s.compareTo(curr.name) > 0) {curr.right = insert(s,curr.right);
+        }else {throw new Exception("Insertion error.");}
+        //return balanced node
+        return balance(curr);
+    }
+
+
+    //balance tree
+    private Node balance(Node curr)throws Exception{
+        if(curr != null){
+            //get height factor
+            int factor = Node.getLevel(curr.right) - Node.getLevel(curr.left);
+            //if tree is already balanced, nothing will happen, when factor == 0 or 1
+            if(Math.abs(factor) <= 1){curr.setLevel();
+            }else if(factor == 2){ //if factor is 2, means that our tree is unbalanced to the right, so we gotta rotate left
+                int childFactor = Node.getLevel(curr.right.right) - Node.getLevel(curr.right.left);
+                //if childFactor = -1, it means that a right-left rotation is needed
+                if(childFactor == -1) {curr.right = rotateRight(curr.right);}
+                //now do left rotation
+                curr = rotateLeft(curr);
+            }else if(factor == -2){ //if factor is -2, means that our tree is unbalanced to the left, so we gotta rotate right
+                int childFactor = Node.getLevel(curr.left.right) - Node.getLevel(curr.left.left);
+                //if childFactor = 1, it means that a left-right rotation is needed
+                if(childFactor == 1) {curr.left = rotateLeft(curr.left);}
+                //now do right rotation
+                curr = rotateRight(curr);
+            } else {
+				throw new Exception("Erro no No(" + curr.name + ") com fator de balanceamento (" + factor + ") invalido!");
+			}
+        }
+        return curr;
+    }
+
+    private Node rotateRight(Node node){
+        Node leftNode = node.left;
+        Node rightLeftNode = leftNode.right;
+
+        leftNode.right = node;
+        node.left = rightLeftNode;
+
+        node.setLevel();
+        leftNode.setLevel();
+
+        return leftNode;
+    }
+
+
+    private Node rotateLeft(Node node){
+       Node rightNode = node.right;
+       Node leftRightNode = rightNode.left;
+
+       rightNode.left = node;
+       node.right = leftRightNode;
+
+       node.setLevel(); 
+       rightNode.setLevel();
+
+       return rightNode;
+    }
+
+
+    //remove element
+    public void remove(String s)throws Exception{
+        root = remove(s,root);       
+    }
+    //actual removal
+    private Node remove(String s, Node curr) throws Exception {
+        if(curr == null){ throw new Exception("Removal error.");
+        }else if(s.compareTo(curr.name) < 0) {curr.left = remove(s,curr.left);
+        }else if(s.compareTo(curr.name) > 0) {curr.right = remove(s,curr.right);
+        }else if(curr.right == null) {curr = curr.left;
+        }else if(curr.left == null) {curr = curr.right;
+        }else {curr.left = getHighestLeft(curr,curr.left);}
+
+        return balance(curr);
+    }
+
+
+
+    //get largest element from root's left child
+    private Node getHighestLeft(Node i, Node j){
+        if(j.right == null){
+            i.name = j.name;
+            j = j.left;
+        }else {j.right = getHighestLeft(i,j.right);}
+        return j;
+    }
+
+
+    public void search(String s){
+        System.out.print("raiz ");
+        boolean ans = search(root,s);
+        if(ans){System.out.print("SIM");
+        }else {System.out.print("NAO");}
+        System.out.println();
+    }
+
+    private boolean search(Node curr, String s){
+        boolean ans = false;
+        if(curr == null) {ans = false;
+        }else if(s.compareTo(curr.name) < 0) {
+            System.out.print("esq" + " ");
+            ans = search(curr.left, s);
+        }else if(s.compareTo(curr.name) > 0) {
+            System.out.print("dir" + " ");
+            ans = search(curr.right, s);
+        }else if(s.equals(curr.name)){ans = true;}
+        
+        return ans;
+    }
+
+    public void walkPre(){
+        walkPre(root);
+    }
+
+    public int ct = 0;
+
+    private void walkPre(Node curr){
+        if(curr != null){
+            System.out.println(curr.name);
+            walkPre(curr.left);
+            walkPre(curr.right);
+        }
+    }
+
+
+}
+
+//main
+
 public class TP05Q03 {
 	
 	public static HashMap<Integer, Game> map = new HashMap<>();
@@ -75,20 +241,19 @@ public class TP05Q03 {
         		tree.remove(spl[1]);
         	}
         }   
+        
 
-        tree.walkPre();
+        //fill third entry
+        do{
+            searchEntry[entryNumber3] = scanner.nextLine();
+        } while(ended(searchEntry[entryNumber3++]) != true);
+        entryNumber3--;
 
-        // //fill third entry
-        // do{
-        //     searchEntry[entryNumber3] = scanner.nextLine();
-        // } while(ended(searchEntry[entryNumber3++]) != true);
-        // entryNumber3--;
-
-        // //search names
-        // for(int i = 0; i < entryNumber3; i++){
-        //     System.out.println(searchEntry[i]);
-        //     tree.search(searchEntry[i]);
-        // }
+        //search names
+        for(int i = 0; i < entryNumber3; i++){
+            System.out.println(searchEntry[i]);
+            tree.search(searchEntry[i]);
+        }
         
 	}
 	
@@ -503,168 +668,4 @@ public class TP05Q03 {
     public boolean getLinux() {
         return linux;
     }	
-}
-
-//create node class\\
-class Node{
-    String name;
-    int level;
-    Node left,right;
-
-    //class constructor
-    public Node(String s){
-        this.name = s;
-        level = 0; 
-        left = right = null;
-    }
-
-    //calculate amount of levels
-    public void setLevel() {this.level = 1 + Math.max(getLevel(left), getLevel(right));}
-
-    //get level
-    public static int getLevel(Node curr) {return (curr == null) ? 0 : curr.level;}
-}
-
-//create class AVL\\
-class AVL{
-    private Node root;
-
-    //initialize tree
-    public AVL(){root = null;}
-
-    //insert element
-    public void insert(String s) throws Exception {
-        root = insert(s,root);
-    }
-
-    //actual insertion
-    private Node insert(String s, Node curr) throws Exception {
-        if(curr == null){curr = new Node(s);
-        }else if(s.compareTo(curr.name) < 0) {curr.left = insert(s,curr.left);
-        }else if(s.compareTo(curr.name) > 0) {curr.right = insert(s,curr.right);
-        }else {throw new Exception("Insertion error.");}
-        //return balanced node
-        return balance(curr);
-    }
-
-
-    //balance tree
-    private Node balance(Node curr)throws Exception{
-        if(curr != null){
-            //get height factor
-            int factor = Node.getLevel(curr.right) - Node.getLevel(curr.left);
-            //if tree is already balanced, nothing will happen, when factor == 0 or 1
-            if(Math.abs(factor) <= 1){curr.setLevel();
-            }else if(factor == 2){ //if factor is 2, means that our tree is unbalanced to the right, so we gotta rotate left
-                int childFactor = Node.getLevel(curr.right.right) - Node.getLevel(curr.right.left);
-                //if childFactor = -1, it means that a right-left rotation is needed
-                if(childFactor == -1) {curr.right = rotateRight(curr.right);}
-                //now do left rotation
-                curr = rotateLeft(curr);
-            }else if(factor == -2){ //if factor is -2, means that our tree is unbalanced to the left, so we gotta rotate right
-                int childFactor = Node.getLevel(curr.left.right) - Node.getLevel(curr.left.left);
-                //if childFactor = 1, it means that a left-right rotation is needed
-                if(childFactor == 1) {curr.left = rotateLeft(curr.left);}
-                //now do right rotation
-                curr = rotateRight(curr);
-            } else {
-				throw new Exception("Erro no No(" + curr.name + ") com fator de balanceamento (" + factor + ") invalido!");
-			}
-        }
-        return curr;
-    }
-
-    private Node rotateRight(Node node){
-        Node leftNode = node.left;
-        Node rightLeftNode = leftNode.right;
-
-        leftNode.right = node;
-        node.left = rightLeftNode;
-
-        node.setLevel();
-        leftNode.setLevel();
-
-        return leftNode;
-    }
-
-
-    private Node rotateLeft(Node node){
-       Node rightNode = node.right;
-       Node leftRightNode = rightNode.left;
-
-       rightNode.left = node;
-       node.right = leftRightNode;
-
-       node.setLevel(); 
-       rightNode.setLevel();
-
-       return rightNode;
-    }
-
-
-    //remove element
-    public void remove(String s)throws Exception{
-        root = remove(s,root);       
-    }
-    //actual removal
-    private Node remove(String s, Node curr) throws Exception {
-        if(curr == null){ throw new Exception("Removal error.");
-        }else if(s.compareTo(curr.name) < 0) {curr.left = remove(s,curr.left);
-        }else if(s.compareTo(curr.name) > 0) {curr.right = remove(s,curr.right);
-        }else if(curr.right == null) {curr = curr.left;
-        }else if(curr.left == null) {curr = curr.right;
-        }else {curr.left = getHighestLeft(curr,curr.left);}
-
-        return balance(curr);
-    }
-
-
-
-    //get largest element from root's left child
-    private Node getHighestLeft(Node i, Node j){
-        if(j.right == null){
-            i.name = j.name;
-            j = j.left;
-        }else {j.right = getHighestLeft(i,j.right);}
-        return j;
-    }
-
-
-    public void search(String s){
-        System.out.print("raiz ");
-        boolean ans = search(root,s);
-        if(ans){System.out.print("SIM");
-        }else {System.out.print("NAO");}
-        System.out.println();
-    }
-
-    private boolean search(Node curr, String s){
-        boolean ans = false;
-        if(curr == null) {ans = false;
-        }else if(s.compareTo(curr.name) < 0) {
-            System.out.print("esq" + " ");
-            ans = search(curr.left, s);
-        }else if(s.compareTo(curr.name) > 0) {
-            System.out.print("dir" + " ");
-            ans = search(curr.right, s);
-        }else if(s.equals(curr.name)){ans = true;}
-        
-        return ans;
-    }
-
-    public void walkPre(){
-        walkPre(root);
-    }
-
-    public int ct = 0;
-
-    private void walkPre(Node curr){
-        if(curr != null){
-            System.out.println(curr.name);
-            walkPre(curr.left);
-            walkPre(curr.right);
-        }
-    }
-
-
 }
