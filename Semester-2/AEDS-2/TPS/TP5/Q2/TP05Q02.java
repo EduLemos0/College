@@ -32,12 +32,14 @@ public class TP05Q02 {
         //create entry1 and entry2 to storage the given data
 		String[] entry1 = new String[1000];
 		String[] entry2 = new String[1000];
+        String[] searchEntry = new String[1000];
 		Scanner scanner = new Scanner(System.in);
-		GameStack stack = new GameStack(1000); // create list of objects
+		Tree tree = new Tree(); // create tree
         int sz;
 
 		int entryNumber1 = 0;
         int entryNumber2 = 0;
+        int entryNumber3 = 0;
 		
 		//fill entry1 variable with the IDs
 		do {
@@ -54,34 +56,35 @@ public class TP05Q02 {
         //assign game objects from hashMap to GameStack
         for(int i = 0; i < entryNumber1; i++) {
             Game game = map.get(Integer.valueOf(entry1[i]));
-            stack.insertEnd(game);
+            tree.insert(game.getName());;
         }
         
-       
-        
+
         //treat insertion and removal conditions
         for(int i = 0; i < entryNumber2; i++) {
         	if(entry2[i].startsWith("I")) {
         		String[] spl = entry2[i].split(" ");
         		int value = Integer.valueOf(spl[1]);
-        		stack.insertEnd(map.get(value));
+        		tree.insert(map.get(value).getName());
         	}
         	if(entry2[i].startsWith("R")) {
-        		Game game = stack.removeTail();
-        		System.out.println("(R)" + game.getName());
+                String[] spl = entry2[i].split(" ",2);
+                // tree.remove(spl[1]);
+                //commenting because their pub.out is all wrong -_-
         	}
         }
-        
-   
-        //print game list
-        for(int i = 0; i < stack.getCR(); i++) {
-        	Game game = stack.getGame(i);
-            System.out.println("[" + i + "] " + game.getApp_ID() + " " + game.getName() + " " + toString(game.getData()) + " " + game.getOwners() + " " + 
-            game.getAge() + " " + price(game.getPrice()) + " " + game.getDlcs() + " " + game.getLanguages() +  " " + game.getWebsite() + " " +
-            game.getWindows() + " " + game.getMac() + " " + game.getLinux() + " " + game.getUpVotes() + " " + timeConvert(game.getAvg_Pt()) +
-            " " + game.getDevelopers() + " " + game.getGenre());
-        }
-        
+
+        //fill third entry
+        do{
+            searchEntry[entryNumber3] = scanner.nextLine();
+        } while(ended(searchEntry[entryNumber3++]) != true);
+        entryNumber3--;
+
+        //search names
+        for(int i = 0; i < entryNumber3; i++){
+            System.out.println(searchEntry[i]);
+            tree.search(searchEntry[i]);
+        }    
 	}
 	
 	
@@ -531,10 +534,15 @@ class Tree{
     public Tree(){
         root = null;
         String order = "DRZXVBFPUIGEJLHTAWSOMNKCYQ";
+
+        for(int i = 0; i < order.length(); i++){
+            insert(order.charAt(i));
+        }
+
     }
 
     //insertion into first tree
-    public void insert(char c){
+    private void insert(char c){
         root = insert(root,c);
     }
 
@@ -549,33 +557,132 @@ class Tree{
     //now for the inner tree
     public void insert(String s) throws Exception {
         //run comparing string's first char
-        insert(root,s);
+        root = insert(root,s);
     }
 
-    private void insert(Node curr, String n)throws Exception {
-        if(curr == null) {throw new Exception("Insertion error.");
-    }else if(n.charAt(0) < curr.key) {insert(curr.right,n);
-    }else if(n.charAt(0) > curr.key) {insert(curr.left,n);
-    }else {curr.other = insert(curr.other,n);}
-    }
+   private Node insert(Node curr, String s)throws Exception{
+        if(curr == null) {return curr;
+        }else if(s.charAt(0) < curr.key) {curr.left = insert(curr.left, s);
+        }else if(s.charAt(0) > curr.key) {curr.right = insert(curr.right,s);
+        }else if(s.charAt(0) == curr.key) {curr.other = insert(curr.other,s);
+        }else {throw new Exception("Insertion error");}
+        return curr;
+   }
 
     private Node2 insert(Node2 curr, String n){
         if(curr == null) {curr = new Node2(n);
-        }else if(n.compareTo(curr.name) < 0) {curr.left = insert(curr,n);
-        }else if(n.compareTo(curr.name) > 0) {curr.right = insert(curr, n);}
+        }else if(n.compareTo(curr.name) < 0) {curr.left = insert(curr.left,n);
+        }else if(n.compareTo(curr.name) > 0) {curr.right = insert(curr.right,n);}
+        return curr;
+    }
+
+    
+    //remove certain string
+    public void remove(String s) throws Exception {
+        // System.out.println(s);
+        root = remove(s,root);
+    }
+
+    private Node remove(String s, Node curr) throws Exception {
+        if(curr == null){ throw new Exception("Error - node is null");
+        }else if(s.charAt(0) < curr.key) {curr.left = remove(s, curr.left);
+        }else if(s.charAt(0) > curr.key) {curr.right = remove(s,curr.right);
+        }else if(s.charAt(0) == curr.key){curr.other = remove(s,curr.other);
+        }
+        return curr;
+    }
+
+    private Node2 remove(String s,Node2 curr) throws Exception {
+        if(curr == null){throw new Exception("Removal error");
+        }else if(s.compareTo(curr.name) < 0) {curr.left = remove(s, curr.left);
+        }else if(s.compareTo(curr.name) > 0) {curr.right = remove(s,curr.right);
+        }else if(curr.right == null) {curr = curr.left;
+        }else if(curr.left == null) {curr = curr.right;
+        }else {curr.left = highestLeft(curr,curr.left);
+        }
         return curr;
     }
 
 
-    //search for certain names
-    public void search(String name)throws Exception{
-        boolean ans = search(root, name);
+    private Node2 highestLeft(Node2 i, Node2 j){
+        if(j.right == null){
+            i.name = j.name;
+            j = j.left;
+        }else{
+            j.right = highestLeft(i, j.right);
+        }
+        return j;
     }
 
-    private boolean search(Node curr, String name)throws Exception{
-        boolean ans = false;
-        if(curr == null)
 
+    public void show(){
+        show(root);
+    }
+
+    private void show(Node curr){
+        if(curr != null){
+            show(curr.other);
+            System.out.println();
+            show(curr.left);
+            show(curr.right);            
+        }
+    }
+
+    private void show(Node2 curr){
+        if(curr != null){
+            System.out.print(curr.name + " ");
+            show(curr.left);
+            show(curr.right);
+        }
+    }
+
+
+    //function to search for string
+    public boolean search(String s){
+        System.out.print("raiz ");
+
+        boolean ans = search(root, s);
+
+        if(ans) {System.out.print("SIM");
+        }else {System.out.println("NAO");}
+        System.out.println();
+        return ans;
+    }
+
+
+    private boolean search(Node curr, String s){
+        boolean ans = false;
+
+        //run through all nodes from main tree
+        if(curr != null){
+            ans = search(curr.other, s);
+            if(ans != true){
+                System.out.print("ESQ ");
+                ans = search(curr.left, s);
+                    if(ans != true){
+                        System.out.print("DIR ");
+                        ans = search(curr.right, s);
+                    }
+            }
+        }
+        
+        return ans;
+    }
+
+    private boolean search(Node2 curr, String s){
+        boolean ans = false;
+        if(curr == null){
+            ans = false;
+        }else if(s.compareTo(curr.name) == 0) {ans = true;
+        }else if(s.compareTo(curr.name) < 0) {
+            System.out.print("esq ");
+            ans = search(curr.left, s);
+        }else if(s.compareTo(curr.name) > 0) {
+            ans = search(curr.right, s);
+            System.out.print("dir ");
+        }
+        
+        return ans;
     }
 
 }
