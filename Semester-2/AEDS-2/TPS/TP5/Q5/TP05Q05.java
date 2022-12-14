@@ -73,7 +73,9 @@ class Hash {
     public void search (String s) {
         System.out.println("=> " + s);
         int ans = strSearch(s);
-        System.out.println("Posicao: " + ans);
+        if(ans == 0){
+            System.out.println("NAO");
+        }else {System.out.println("Posicao: " + ans);}
     }   
 
 
